@@ -1,24 +1,18 @@
-import { treeNodeFolder } from "./systemfile.js"
-
-treeNodeFolder.addFile("/a.txt")
-treeNodeFolder.addFile("/a.txt")
-
-treeNodeFolder.addFile("/b.txt")
-treeNodeFolder.addFile("/folder")
-
-treeNodeFolder.addFile("/folder/folder2/folder3/algo.txt")
-treeNodeFolder.addFile("/folder/folder2/folder4/folder5/algo2.txt")
-treeNodeFolder.addFile("/folder/folder2/folder4/folder5/algo2.txt")
-
-treeNodeFolder.addFolder("/folder_raiz")
-treeNodeFolder.addFolder("/folder_raiz")
-treeNodeFolder.addFolder("/folder/folder_random")
-treeNodeFolder.addFolder("/folder/folder_random")
+import { treeNodeFolder } from "./filesystem.js"
 
 const initialPath = "/"
 
 const addFolderBtn = document.querySelector(".btn-add-folder")
+const addFileBtn = document.querySelector(".btn-add-file")
+
 addFolderBtn.addEventListener("click", e => {
 	const folderName = prompt("Nombre de la nueva carpeta")
-	treeNodeFolder.addFolder(`${initialPath}${folderName}`)
+	treeNodeFolder.addFolder(initialPath, folderName)
+	console.log(treeNodeFolder)
+})
+
+addFileBtn.addEventListener("click", e => {
+	const fileName = prompt("Nombre del archivo nuevo")
+	treeNodeFolder.addFile(initialPath, fileName)
+	console.log(treeNodeFolder)
 })

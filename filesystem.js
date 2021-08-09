@@ -10,14 +10,10 @@ class SystemTreeNode {
 		this.root = rootNode
 	}
 
-	addFile(path) {
-		const pathSplitted = path.split("/")
+	addFile(path, fileName) {
+		let fileExt = fileName.split(".")
+		fileExt = fileExt.length === 1 ? "" : fileExt[fileExt.length - 1]
 
-		// fileExt = [fileName, extension]
-		let fileExt = pathSplitted.slice(-1)[0].split(".")
-		fileExt = fileExt.length === 1 ? "" : fileExt[1]
-
-		const fileName = pathSplitted[pathSplitted.length - 1].split(".")[0]
 		const fileFullName = `${fileName}.${fileExt}`
 
 		//crear las carpetas que no existen en el path
@@ -37,12 +33,9 @@ class SystemTreeNode {
 		lastNodeCreated.children.push(new SystemFile(fileName, fileExt, path))
 	}
 
-	addFolder(path) {
-		const folders = path.split("/").slice(1)
-		const folderName = folders[folders.length - 1]
-
+	addFolder(path, folderName) {
 		//crear las carpetas que no existen en el path
-		const { lastNodeCreated } = this.recreatePath(path)
+		const { lastNodeCreated } = this.recreatePath(path + folderName)
 
 		const existsFolder = this.findInNode(
 			lastNodeCreated,
