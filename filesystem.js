@@ -6,36 +6,49 @@ const types = {
 //TODO: RENAME FILES AND FOLDERS
 
 class SystemTreeNode {
-	constructor(rootNode) {
-		this.root = rootNode
+	constructor() {
+		this.root = new SystemFolder(null, "", "/")
+	}
+
+	getFullPath(path, name) {
+		return `${path === this.root.path ? path : path + "/"}${name}`
 	}
 
 	addFile(path, fileName) {
+		//TODO: INTENTAR SACAR ESTA RESTRICION USANDO RECREATE PATH CREAR LA CARPETA DIRECTAMENTE
+		if (fileName.includes("/")) {
+			return console.error("el archivo no puede contener /")
+		}
+		if (!fileName) return console.error("el archivo debe tener nombre")
+
 		let fileExt = fileName.split(".")
 		fileExt = fileExt.length === 1 ? "" : fileExt[fileExt.length - 1]
-
-		const fileFullName = `${fileName}.${fileExt}`
+		const fullPath = this.getFullPath(path, fileName)
 
 		//crear las carpetas que no existen en el path
-		const { lastNodeCreated } = this.recreatePath(path)
+		const { lastNodeCreated } = this.recreatePath(fullPath)
 
 		//añadir el archvio
-		const existsFile = this.findInNode(
-			lastNodeCreated,
-			fileFullName,
-			types.file
-		)
+		const existsFile = this.findInNode(lastNodeCreated, fileName, types.file)
 
 		if (existsFile.node) {
-			return console.log("ya existe el archivo", fileFullName)
+			return console.log("ya existe el archivo", fileName)
 		}
 
-		lastNodeCreated.children.push(new SystemFile(fileName, fileExt, path))
+		lastNodeCreated.children.push(new SystemFile(fileName, fileExt, fullPath))
 	}
 
 	addFolder(path, folderName) {
+		//TODO: INTENTAR SACAR ESTA RESTRICION USANDO RECREATE PATH CREAR LA CARPETA DIRECTAMENTE
+		if (folderName.includes("/")) {
+			return console.error("el archivo no puede contener /")
+		}
+		if (!folderName) return console.error("el archivo debe tener nombre")
+
+		const fullPath = this.getFullPath(path, folderName)
+
 		//crear las carpetas que no existen en el path
-		const { lastNodeCreated } = this.recreatePath(path + folderName)
+		const { lastNodeCreated } = this.recreatePath(fullPath)
 
 		const existsFolder = this.findInNode(
 			lastNodeCreated,
@@ -47,14 +60,14 @@ class SystemTreeNode {
 			return console.log("ya existe la carpeta", folderName)
 		}
 
-		lastNodeCreated.children.push(new SystemFolder(null, folderName, path))
+		lastNodeCreated.children.push(new SystemFolder(null, folderName, fullPath))
 	}
 
 	recreatePath(path) {
 		const pathSplitted = path.split("/")
 		const folders = pathSplitted.slice(1, -1)
 
-		let recreatedPath = ""
+		let recreatedPath = this.root.path
 		let searchingIn = this.root
 
 		for (let index = 0; index < folders.length; index++) {
@@ -78,12 +91,34 @@ class SystemTreeNode {
 			)
 			//empezar a buscar en la nueva carpeta agregada
 			searchingIn = searchingIn.children[length - 1]
+			console.log(searchingIn)
 		}
 
 		return {
 			lastNodeCreated: searchingIn,
 			recreatedPath
 		}
+	}
+
+	getNodesByPath(path) {
+		if (path === "/") return this.root
+
+		const pathSplitted = path.split("/")
+		const folders = pathSplitted.slice(1)
+
+		let searchingIn = this.root
+
+		for (let index = 0; index < folders.length; index++) {
+			const folderName = folders[index]
+			const currentFolder = this.findInNode(
+				searchingIn,
+				folderName,
+				types.folder
+			)
+
+			searchingIn = searchingIn.children[currentFolder.index]
+		}
+		return searchingIn
 	}
 
 	findInNode(node, nameToSearch, type) {
@@ -132,8 +167,6 @@ class SystemFile {
 	}
 }
 
-const rootNodeOfFolder = new SystemFolder(null, "root", "/")
+const treeNodeFolder = new SystemTreeNode()
 
-const treeNodeFolder = new SystemTreeNode(rootNodeOfFolder)
-
-export { treeNodeFolder }
+export { treeNodeFolder, types }
