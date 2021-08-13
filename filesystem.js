@@ -161,7 +161,7 @@ class SystemFolder {
 class SystemFile {
 	constructor(title, extension, path) {
 		this.title = title
-		this.extension = extension
+		this.extension = extension === "" ? "No extension" : extension
 		this.path = path
 		this.type = types.file
 	}

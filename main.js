@@ -68,24 +68,31 @@ function render() {
 
 	nodeToRender.children.forEach(child => {
 		const div = document.createElement("div")
+		div.classList.add("file-container", child.type)
 		div.insertAdjacentHTML(
 			"afterbegin",
-			`<div class='${child.type}' data-title='${child.title}' data-type=${child.type}>${child.title}</div>`
+			`<div data-title='${child.title}' data-type=${child.type}>${
+				child.title
+			}</div>
+			${
+				child.type === types.file &&
+				`<span class="file-ext">${child.extension}</span>`
+			}`
 		)
-		div.addEventListener("click", openFile)
+
+		div.addEventListener("click", openFile, false)
+		div.addEventListener(
+			"click",
+			e => {
+				e.stopPropagation()
+				unSelectFile()
+				e.target.classList.add("file-active")
+			},
+			false
+		)
 		container.append(div)
+		console.log(div)
 	})
-
-	const allFiles = document.querySelectorAll(`.${types.file}`)
-	allFiles.forEach(fileNode => {
-		fileNode.addEventListener("click", e => {
-			e.stopPropagation()
-			unSelectFile()
-			e.target.classList.add("file-active")
-		})
-	})
-
-	console.log(treeNodeFolder)
 }
 
 render()

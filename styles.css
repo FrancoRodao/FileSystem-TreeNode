@@ -1,3 +1,12 @@
 .file-active {
-	background-color: rgb(23, 143, 223);
+	background-color: rgba(23, 143, 223, 0.466);
+}
+
+.file-container {
+	display: flex;
+	justify-content: space-between;
+}
+
+.file-ext {
+	color: rgb(75, 75, 75);
 }
