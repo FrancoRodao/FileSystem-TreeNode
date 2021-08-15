@@ -62,6 +62,12 @@ function unSelectFile() {
 	}
 }
 
+function selectFile(event) {
+	event.stopPropagation()
+	unSelectFile()
+	event.currentTarget.classList.add("file-active")
+}
+
 function render() {
 	clearContainer()
 	const nodeToRender = treeNodeFolder.getNodesByPath(visorPath())
@@ -80,16 +86,8 @@ function render() {
 			}`
 		)
 
-		div.addEventListener("click", openFile, false)
-		div.addEventListener(
-			"click",
-			e => {
-				e.stopPropagation()
-				unSelectFile()
-				e.target.classList.add("file-active")
-			},
-			false
-		)
+		div.addEventListener("click", openFile)
+		div.addEventListener("click", selectFile)
 		container.append(div)
 		console.log(div)
 	})
