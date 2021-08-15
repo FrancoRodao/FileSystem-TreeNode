@@ -6,34 +6,45 @@ window.addEventListener("click", e => unSelectFile())
 const visor = document.querySelector(".visor")
 const intialPath = treeNodeFolder.root.path
 visor.textContent = intialPath
-const visorPath = () => visor.textContent
+const getVisorPath = () => visor.textContent
 
 /* BUTTONS */
 const addFolderBtn = document.querySelector(".btn-add-folder")
 const addFileBtn = document.querySelector(".btn-add-file")
 const backBtn = document.querySelector(".btn-back")
+const deleteBtn = document.querySelector(".btn-delete-file")
 
 addFolderBtn.addEventListener("click", e => {
 	const folderName = prompt("Nombre de la nueva carpeta")
 	if (!folderName) return
-	treeNodeFolder.addFolder(visorPath(), folderName)
+	treeNodeFolder.addFolder(getVisorPath(), folderName)
 	render()
 })
 
 addFileBtn.addEventListener("click", e => {
 	const fileName = prompt("Nombre del archivo nuevo")
 	if (!fileName) return
-	treeNodeFolder.addFile(visorPath(), fileName)
+	treeNodeFolder.addFile(getVisorPath(), fileName)
 	render()
 })
 
 backBtn.addEventListener("click", e => {
-	if (visorPath() === intialPath) return
+	if (getVisorPath() === intialPath) return
 
-	const aux = visorPath().split("/")
+	const aux = getVisorPath().split("/")
 	visor.textContent =
 		aux[aux.length - 2] === "" ? "/" : aux.slice(0, -1).join("/")
 	render()
+})
+
+deleteBtn.addEventListener("click", e => {
+	const selectedFile = getSelectedFile()
+	if (!selectedFile) {
+		console.log("no hay archivos selecionados")
+		return
+	}
+	const fileName = selectedFile.childNodes[0].dataset.title
+	treeNodeFolder.deleteFile(getVisorPath(), fileName)
 })
 
 /* RENDERS */
@@ -68,9 +79,11 @@ function selectFile(event) {
 	event.currentTarget.classList.add("file-active")
 }
 
+const getSelectedFile = () => document.querySelector(".file-active")
+
 function render() {
 	clearContainer()
-	const nodeToRender = treeNodeFolder.getNodesByPath(visorPath())
+	const nodeToRender = treeNodeFolder.getNodeByPath(getVisorPath())
 
 	nodeToRender.children.forEach(child => {
 		const div = document.createElement("div")
@@ -89,7 +102,6 @@ function render() {
 		div.addEventListener("click", openFile)
 		div.addEventListener("click", selectFile)
 		container.append(div)
-		console.log(div)
 	})
 }
 

@@ -38,6 +38,12 @@ class SystemTreeNode {
 		lastNodeCreated.children.push(new SystemFile(fileName, fileExt, fullPath))
 	}
 
+	deleteFile(path, fileName) {
+		const node = this.getNodeByPath(path)
+		const file = this.findInNode(node, fileName, types.file)
+		node.children.splice(file.index, 1)
+	}
+
 	addFolder(path, folderName) {
 		//TODO: INTENTAR SACAR ESTA RESTRICION USANDO RECREATE PATH CREAR LA CARPETA DIRECTAMENTE
 		if (folderName.includes("/")) {
@@ -100,7 +106,7 @@ class SystemTreeNode {
 		}
 	}
 
-	getNodesByPath(path) {
+	getNodeByPath(path) {
 		if (path === "/") return this.root
 
 		const pathSplitted = path.split("/")
