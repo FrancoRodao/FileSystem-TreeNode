@@ -10,3 +10,22 @@
 .file-ext {
 	color: rgb(75, 75, 75);
 }
+
+.context-menu {
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: none;
+	background-color: rgb(75, 75, 75);
+	flex-direction: column;
+}
+
+.cxt-menu-item {
+	width: 100px;
+	height: 25px;
+}
+
+.cxt-open,
+.cxt-delete {
+	display: none;
+}

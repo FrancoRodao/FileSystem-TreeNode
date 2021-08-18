@@ -38,9 +38,11 @@ class SystemTreeNode {
 		lastNodeCreated.children.push(new SystemFile(fileName, fileExt, fullPath))
 	}
 
-	deleteFile(path, fileName) {
+	deleteFile(path, type, name) {
+		this.checkIsValidType(type)
+
 		const node = this.getNodeByPath(path)
-		const file = this.findInNode(node, fileName, types.file)
+		const file = this.findInNode(node, name, type)
 		node.children.splice(file.index, 1)
 	}
 
@@ -128,12 +130,7 @@ class SystemTreeNode {
 	}
 
 	findInNode(node, nameToSearch, type) {
-		if (!Object.values(types).includes(type)) {
-			throw new Error(
-				`Tipo invalido. Utiliza los tipos de la constante types.
-				 Los tipos validos son: ${Object.values(types)}`
-			)
-		}
+		this.checkIsValidType(type)
 
 		for (let i = 0; i < node.children.length; i++) {
 			const child = node.children[i]
@@ -151,6 +148,15 @@ class SystemTreeNode {
 		return {
 			node: null,
 			index: -1
+		}
+	}
+
+	checkIsValidType(type) {
+		if (!Object.values(types).includes(type)) {
+			throw new Error(
+				`Tipo invalido. Utiliza los tipos de la constante types.
+				 Los tipos validos son: ${Object.values(types)}`
+			)
 		}
 	}
 }
