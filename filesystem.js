@@ -3,8 +3,6 @@ const types = {
 	file: "FILE"
 }
 
-//TODO: RENAME FILES AND FOLDERS
-
 class SystemTreeNode {
 	constructor() {
 		this.root = new SystemFolder(null, "", "/")
@@ -21,8 +19,7 @@ class SystemTreeNode {
 		}
 		if (!fileName) return console.error("el archivo debe tener nombre")
 
-		let fileExt = fileName.split(".")
-		fileExt = fileExt.length === 1 ? "" : fileExt[fileExt.length - 1]
+		let fileExt = SystemFile.getExtensionOfFileName(fileName)
 		const fullPath = this.getFullPath(path, fileName)
 
 		//crear las carpetas que no existen en el path
@@ -69,6 +66,15 @@ class SystemTreeNode {
 		}
 
 		lastNodeCreated.children.push(new SystemFolder(null, folderName, fullPath))
+	}
+
+	rename(path, type, name, newName) {
+		if (name === newName) return
+
+		const node = this.getNodeByPath(path)
+		const file = this.findInNode(node, name, type)
+		console.log(path, type, name, newName, file)
+		file.node.rename(newName)
 	}
 
 	recreatePath(path) {
@@ -161,12 +167,22 @@ class SystemTreeNode {
 	}
 }
 
+//TODO: create abstract class
 class SystemFolder {
 	constructor(children, title, path) {
 		this.children = children || []
 		this.title = title
 		this.path = path
 		this.type = types.folder
+	}
+
+	rename(newName) {
+		const pathSplitted = this.path.split("/")
+		//replace name in path
+		pathSplitted[pathSplitted.length - 1] = newName
+
+		this.path = pathSplitted.join("/")
+		this.title = newName
 	}
 }
 
@@ -176,6 +192,22 @@ class SystemFile {
 		this.extension = extension === "" ? "No extension" : extension
 		this.path = path
 		this.type = types.file
+	}
+
+	rename(newName) {
+		const pathSplitted = this.path.split("/")
+		//replace name in path
+		pathSplitted[pathSplitted.length - 1] = newName
+
+		this.path = pathSplitted.join("/")
+		this.title = newName
+		this.extension = SystemFile.getExtensionOfFileName(newName)
+	}
+
+	static getExtensionOfFileName(fileName) {
+		let fileExt = fileName.split(".")
+		fileExt = fileExt.length === 1 ? "" : fileExt[fileExt.length - 1]
+		return fileExt
 	}
 }
 

@@ -30,10 +30,12 @@ const contextMenu = document.querySelector(".context-menu")
 const cxtMenuNewFolder = document.querySelector(".cxt-newfolder")
 const cxtMenuNewFile = document.querySelector(".cxt-newfile")
 const cxtMenuOpen = document.querySelector(".cxt-open")
+const cxtMenuRename = document.querySelector(".cxt-rename")
 const cxtMenuDelete = document.querySelector(".cxt-delete")
 
 //open context menu
 let cxtMenuOpenHandler = null
+let cxtMenuRenameHandler = null
 let cxtMenuRemoveHandler = null
 window.addEventListener("contextmenu", e => {
 	e.preventDefault()
@@ -41,6 +43,7 @@ window.addEventListener("contextmenu", e => {
 	contextMenu.style.left = `${e.clientX}px`
 	contextMenu.style.display = "flex"
 	cxtMenuOpen.style.display = "none"
+	cxtMenuRename.style.display = "none"
 	cxtMenuDelete.style.display = "none"
 
 	if (
@@ -49,11 +52,16 @@ window.addEventListener("contextmenu", e => {
 		e.target.dataset.type === types.file
 	) {
 		cxtMenuOpen.style.display = "block"
+		cxtMenuRename.style.display = "block"
 		cxtMenuDelete.style.display = "block"
 
 		cxtMenuOpen.removeEventListener("click", cxtMenuOpenHandler)
 		cxtMenuOpenHandler = () => openFileHandler(e)
 		cxtMenuOpen.addEventListener("click", cxtMenuOpenHandler)
+
+		cxtMenuRename.removeEventListener("click", cxtMenuRenameHandler)
+		cxtMenuRenameHandler = () => renameFileHandler(e)
+		cxtMenuRename.addEventListener("click", cxtMenuRenameHandler)
 
 		cxtMenuDelete.removeEventListener("click", cxtMenuRemoveHandler)
 		cxtMenuRemoveHandler = () => removeFileHandler(e)
@@ -65,6 +73,7 @@ cxtMenuNewFolder.addEventListener("click", e => {
 	const folderName = prompt("Folder name")
 	if (!folderName) return
 	treeNodeFolder.addFolder(getVisorPath(), folderName)
+	//TODO: render only the affected file
 	render()
 })
 
@@ -72,6 +81,7 @@ cxtMenuNewFile.addEventListener("click", e => {
 	const fileName = prompt("File name")
 	if (!fileName) return
 	treeNodeFolder.addFile(getVisorPath(), fileName)
+	//TODO: render only the affected file
 	render()
 })
 
@@ -96,8 +106,12 @@ backBtn.addEventListener("click", e => {
 const container = document.querySelector(".container")
 const clearContainer = () => (container.textContent = "")
 
+const isFileContainer = HTMLElement => {
+	return HTMLElement.classList.contains("file-container")
+}
+
 function openFileHandler({ target }) {
-	const openFile = ({ type, title }) => {
+	const openFile = (type, title) => {
 		switch (type) {
 			case types.folder:
 				visor.textContent +=
@@ -112,36 +126,49 @@ function openFileHandler({ target }) {
 		}
 	}
 
-	//click on file-container
-	if (target.classList.contains("file-container")) {
-		openFile(target.firstChild.dataset)
-	}
 	/*
-	click on file (child of file-container see how the files 
-				   are rendered in the render function)
+		click on file-container or file 
+		(see how the files are rendered in the render function)
 	*/
-	if (target.dataset.type) openFile(target.dataset)
+	const { type, title } = isFileContainer(target)
+		? target.firstChild.dataset
+		: target.dataset
+	openFile(type, title)
 
 	render()
 }
 
+function renameFileHandler({ target }) {
+	/*
+		click on file-container or file 
+		(see how the files are rendered in the render function)
+	*/
+	const { title, type } = isFileContainer(target)
+		? target.firstChild.dataset
+		: target.dataset
+
+	const newName = prompt(`Rename ${title}`)
+	if (!newName) return
+
+	treeNodeFolder.rename(getVisorPath(), type, title, newName)
+
+	//TODO: render only the affected file
+	render()
+}
+
 function removeFileHandler({ target }) {
-	//click on file-container
-	if (target.classList.contains("file-container")) {
-		const { type, title } = target.firstChild.dataset
+	/*
+		click on file-container or file 
+		(see how the files are rendered in the render function)
+	*/
+	const { title, type } = isFileContainer(target)
+		? target.firstChild.dataset
+		: target.dataset
+
+	if (type === types.folder || type === types.file) {
 		treeNodeFolder.delete(getVisorPath(), type, title)
 	}
-
-	if (
-		target.dataset.type === types.folder ||
-		target.dataset.type === types.file
-	) {
-		treeNodeFolder.delete(
-			getVisorPath(),
-			target.dataset.type,
-			target.dataset.title
-		)
-	}
+	//TODO: render only the affected file
 	render()
 }
 
@@ -154,7 +181,7 @@ function unSelectFiles() {
 
 function selectFile(HTMLElement) {
 	unSelectFiles()
-	console.log(HTMLElement)
+
 	if (
 		!HTMLElement.classList.contains("file-container") &&
 		HTMLElement.dataset.title
