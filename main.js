@@ -1,6 +1,8 @@
 import { treeNodeFolder, types } from "./filesystem.js"
 
 window.addEventListener("click", e => {
+	if (e.target.classList.contains("file-ext")) return
+
 	unSelectFiles()
 	if (
 		e.target.classList.contains("file-container") ||
@@ -127,14 +129,14 @@ function removeFileHandler({ target }) {
 	//click on file-container
 	if (target.classList.contains("file-container")) {
 		const { type, title } = target.firstChild.dataset
-		treeNodeFolder.deleteFile(getVisorPath(), type, title)
+		treeNodeFolder.delete(getVisorPath(), type, title)
 	}
 
 	if (
 		target.dataset.type === types.folder ||
 		target.dataset.type === types.file
 	) {
-		treeNodeFolder.deleteFile(
+		treeNodeFolder.delete(
 			getVisorPath(),
 			target.dataset.type,
 			target.dataset.title
@@ -152,12 +154,17 @@ function unSelectFiles() {
 
 function selectFile(HTMLElement) {
 	unSelectFiles()
-	if (!HTMLElement.classList.contains("file-container")) {
+	console.log(HTMLElement)
+	if (
+		!HTMLElement.classList.contains("file-container") &&
+		HTMLElement.dataset.title
+	) {
 		HTMLElement.parentElement.classList.add("file-active")
-		return
 	}
 
-	HTMLElement.classList.add("file-active")
+	if (HTMLElement.classList.contains("file-container")) {
+		HTMLElement.classList.add("file-active")
+	}
 }
 
 function render() {
@@ -183,6 +190,8 @@ function render() {
 
 		container.append(fileContainer)
 	})
+
+	console.log(treeNodeFolder)
 }
 
 render()

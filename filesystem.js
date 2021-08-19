@@ -38,7 +38,7 @@ class SystemTreeNode {
 		lastNodeCreated.children.push(new SystemFile(fileName, fileExt, fullPath))
 	}
 
-	deleteFile(path, type, name) {
+	delete(path, type, name) {
 		this.checkIsValidType(type)
 
 		const node = this.getNodeByPath(path)
@@ -144,7 +144,7 @@ class SystemTreeNode {
 			continue
 		}
 
-		//no encontrado
+		//not founded
 		return {
 			node: null,
 			index: -1
