@@ -73,7 +73,6 @@ class SystemTreeNode {
 
 		const node = this.getNodeByPath(path)
 		const file = this.findInNode(node, name, type)
-		console.log(path, type, name, newName, file)
 		file.node.rename(newName)
 	}
 

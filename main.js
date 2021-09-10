@@ -182,14 +182,11 @@ function unSelectFiles() {
 function selectFile(HTMLElement) {
 	unSelectFiles()
 
-	if (
-		!HTMLElement.classList.contains("file-container") &&
-		HTMLElement.dataset.title
-	) {
+	if (!isFileContainer(HTMLElement) && HTMLElement.dataset.title) {
 		HTMLElement.parentElement.classList.add("file-active")
 	}
 
-	if (HTMLElement.classList.contains("file-container")) {
+	if (isFileContainer(HTMLElement)) {
 		HTMLElement.classList.add("file-active")
 	}
 }
@@ -197,6 +194,7 @@ function selectFile(HTMLElement) {
 function render() {
 	clearContainer()
 	const nodeToRender = treeNodeFolder.getNodeByPath(getVisorPath())
+	const fragment = document.createDocumentFragment()
 
 	nodeToRender.children.forEach(child => {
 		const fileContainer = document.createElement("div")
@@ -215,8 +213,10 @@ function render() {
 			fileContainer.append(extensionSpan)
 		}
 
-		container.append(fileContainer)
+		fragment.append(fileContainer)
 	})
+
+	container.append(fragment)
 
 	console.log(treeNodeFolder)
 }
